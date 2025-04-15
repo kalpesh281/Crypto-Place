@@ -2,14 +2,19 @@ import React from "react";
 import "./Navbar.css";
 import logo from "../../assets/logo.png";
 import { UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
     <>
       <div className="navbar">
-        <img src={logo} alt="logo" className="logo" />
+        <Link to="/">
+          <img src={logo} alt="logo" className="logo" />
+        </Link>
         <ul>
-          <li>Home</li>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
           <li>Features</li>
           <li>Pricing</li>
           <li>Blog</li>
