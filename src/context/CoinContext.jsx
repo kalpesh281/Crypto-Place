@@ -1,33 +1,42 @@
 import { useEffect } from "react";
-import { Currency } from "lucide-react";
 import { createContext, useState } from "react";
 
 export const CoinContext = createContext();
 
 const CoinProvider = (props) => {
   const [allCoin, setAllCoin] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const [currency, setCurrency] = useState({
     name: "usd",
     symbol: "$",
   });
 
   const fetchAllCoin = async () => {
-    const options = {
-      method: "GET",
-      headers: {
-        accept: "application/json",
-        "x-cg-pro-api-key": "CG-aq2HeQeaskDuWsRAoRYfD3VD",
-      },
-    };
+    try {
+      setLoading(true);
+      setError(null);
+      // Using the public endpoint without API key to avoid rate limiting issues
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.name}&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+      );
 
-    fetch(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency.name}`,
-      options
-    )
-      .then((res) => res.json())
-      .then((res) => setAllCoin(res))
-      .catch((err) => console.error(err));
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAllCoin(data);
+    } catch (err) {
+      console.error("Error fetching coin data:", err);
+      setError(err.message);
+      // Keep the previous data if there's an error
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
     fetchAllCoin();
   }, [currency]);
